@@ -148,9 +148,12 @@ func newKubeConfigAssets(assets Assets, conf Config) ([]Asset, error) {
 		return nil, err
 	}
 
-	bootstrapTokenID, bootstrapTokenSecret, err := newBootstrapToken()
-	if err != nil {
-		return nil, err
+	if conf.BootstrapTokenID == "" && conf.BootstrapTokenSecret == "" {
+		var err error
+		conf.BootstrapTokenID, conf.BootstrapTokenSecret, err = newBootstrapToken()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cfg := struct {
@@ -165,8 +168,8 @@ func newKubeConfigAssets(assets Assets, conf Config) ([]Asset, error) {
 		CACert:               base64.StdEncoding.EncodeToString(caCert.Data),
 		AdminCert:            base64.StdEncoding.EncodeToString(adminCert.Data),
 		AdminKey:             base64.StdEncoding.EncodeToString(adminKey.Data),
-		BootstrapTokenID:     bootstrapTokenID,
-		BootstrapTokenSecret: bootstrapTokenSecret,
+		BootstrapTokenID:     conf.BootstrapTokenID,
+		BootstrapTokenSecret: conf.BootstrapTokenSecret,
 	}
 
 	templates := []struct {
