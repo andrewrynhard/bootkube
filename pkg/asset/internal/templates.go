@@ -165,7 +165,7 @@ spec:
         - --insecure-port=0
         - --kubelet-client-certificate=/etc/kubernetes/secrets/apiserver.crt
         - --kubelet-client-key=/etc/kubernetes/secrets/apiserver.key
-        - --secure-port={{ (index .APIServers 0).Port }}
+        - --secure-port={{ .LocalAPIServerPort }}
         - --service-account-key-file=/etc/kubernetes/secrets/service-account.pub
         - --service-cluster-ip-range={{ .ServiceCIDR }}
         - --tls-cert-file=/etc/kubernetes/secrets/apiserver.crt
@@ -233,7 +233,7 @@ spec:
     - --etcd-servers={{ range $i, $e := .EtcdServers }}{{ if $i }},{{end}}{{ $e }}{{end}}
     - --kubelet-client-certificate=/etc/kubernetes/secrets/apiserver.crt
     - --kubelet-client-key=/etc/kubernetes/secrets/apiserver.key
-    - --secure-port={{ (index .APIServers 0).Port }}
+    - --secure-port={{ .LocalAPIServerPort }}
     - --service-account-key-file=/etc/kubernetes/secrets/service-account.pub
     - --service-cluster-ip-range={{ .ServiceCIDR }}
     - --cloud-provider={{ .CloudProvider }}

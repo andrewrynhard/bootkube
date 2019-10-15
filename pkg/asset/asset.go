@@ -106,7 +106,8 @@ type Config struct {
 	EtcdClientKey          *rsa.PrivateKey
 	EtcdServers            []*url.URL
 	EtcdUseTLS             bool
-	APIServers             []*url.URL
+	ControlPlaneEndpoint   *url.URL
+	LocalAPIServerPort     int
 	CACert                 *x509.Certificate
 	CAPrivKey              *rsa.PrivateKey
 	AltNames               *tlsutil.AltNames
@@ -178,7 +179,6 @@ func NewDefaultAssets(conf Config) (Assets, error) {
 	}
 	as = append(as, kubeConfigAssets...)
 
-	// K8S APIServer secret
 	apiSecret, err := newAPIServerSecretAsset(as, conf.EtcdUseTLS)
 	if err != nil {
 		return Assets{}, fmt.Errorf("failed to create API server assets: %+v", err)
