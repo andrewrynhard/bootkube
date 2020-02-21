@@ -85,6 +85,11 @@ func CreateAssets(config clientcmd.ClientConfig, manifestDir string, timeout tim
 }
 
 func apiTest(c clientcmd.ClientConfig) error {
+	raw, err := c.RawConfig()
+	context := raw.Contexts[raw.CurrentContext]
+	cluster := raw.Clusters[context.Cluster]
+	cluster.Server = "https://127.0.0.1:6443"
+
 	config, err := c.ClientConfig()
 	if err != nil {
 		return err
@@ -96,7 +101,13 @@ func apiTest(c clientcmd.ClientConfig) error {
 
 	// API Server is responding
 	healthStatus := 0
-	client.Discovery().RESTClient().Get().AbsPath("/healthz").Do().StatusCode(&healthStatus)
+	res := client.Discovery().RESTClient().Get().AbsPath("/healthz").Do()
+	res.StatusCode(&healthStatus)
+
+	if res.Error() != nil {
+		return fmt.Errorf("Error getting API Server health: %w", res.Error())
+	}
+
 	if healthStatus != http.StatusOK {
 		return fmt.Errorf("API Server http status: %d", healthStatus)
 	}
